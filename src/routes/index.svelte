@@ -477,7 +477,6 @@
   height: 150px;
   border-radius: 50%;
 }
-
 .input-wrapper {
   margin-top: 4px;
   align-items: center;
