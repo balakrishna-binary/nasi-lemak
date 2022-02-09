@@ -13,4 +13,5 @@ export const initialData = {
   phone: '',
   work_phone: '',
   email: '',
+  fax: '',
 };

@@ -1,97 +1,29 @@
-export async function generateVCard(user, logo?: string) {
+export async function generateVCard(user, logo) {
   try {
-    const {
-      FNProperty,
-      TextType,
-      VCARD,
-      PhotoProperty,
-      URIType,
-      OrgProperty,
-      TypeParameter,
-      SpecialValueType,
-      AdrProperty,
-      TelProperty,
-      ValueParameter,
-      TextListType,
-      PrefParameter,
-      IntegerType,
-      EmailProperty,
-      NProperty
-    } = await import('vcard4');
+    const VCardJS = (await import('vcards-js')).default;
+    const vcard = VCardJS();
+    if (user?.first_name) vcard.firstName = user.first_name;
+    if (user?.last_name) vcard.lastName = user.last_name;
+    if (user?.email) vcard.email = user.email;
+    if (user?.company) vcard.organization = user.company;
+    if (user?.work_phone) vcard.workPhone = user.work_phone;
+    if (user?.phone) vcard.cellPhone = user.phone;
+    if (user?.designation) vcard.role = user.designation;
+    if (user?.website) vcard.url = user.website;
+    if (user?.address?.street) vcard.homeAddress.street = user?.address?.street;
+    if (user?.address?.city) vcard.homeAddress.city = user?.address?.city;
+    if (user?.address?.zip) vcard.homeAddress.postalCode = user?.address?.zip;
+    if (user?.address?.countryRegion) vcard.homeAddress.countryRegion = user?.address?.street;
+    if (user?.gender) vcard.gender = user?.gender;
+    // vcard.birthday = new Date();
 
-    const full_name = new FNProperty([], new TextType([user.first_name, user.last_name].filter(n => n).join(' ')));
-
-    const nArr = new Array(5);
-    nArr[0] = new TextType(user.last_name);
-    nArr[1] = new TextType(user.first_name);
-    const additional_name = new NProperty([], new SpecialValueType(nArr, "nproperty"));
-
-    const organization = new OrgProperty(
-      [new TypeParameter(new TextType("work"), "orgproperty")],
-      new SpecialValueType([new TextType(user?.company)], "orgproperty")
-    );
-
-    const aArr = new Array(7);
-    aArr[1] = new TextType(user?.address?.street || '');
-    aArr[3] = new TextType(user?.address?.state || '');
-    aArr[5] = new TextType(user?.address?.zip || '');
-    aArr[6] = new TextType(user?.address?.country || '');
-    const address = new AdrProperty(
-      [new TypeParameter(new TextType("work"), "adrproperty")],
-      new SpecialValueType(aArr, "adrproperty")
-    );
-
-    const phone = new TelProperty(
-      [
-        new ValueParameter(new URIType("tel:" + user?.phone || '')),
-        new TypeParameter(
-          new TextListType([new TextType("HOME"), new TextType("voice")]),
-          "telproperty"
-        ),
-        new PrefParameter(new IntegerType(1)),
-      ],
-      new URIType("tel:" + user?.phone || '')
-    );
-
-    const work_phone = new TelProperty(
-      [
-        new ValueParameter(new URIType("tel:" + user?.work_phone || '')),
-        new TypeParameter(
-          new TextListType([
-            new TextType("WORK"),
-            new TextType("CELL"),
-            new TextType("VOICE"),
-            new TextType("VIDEO"),
-          ]),
-          "telproperty"
-        ),
-      ],
-      new URIType("tel:" + user?.work_phone || '')
-    );
-
-    const email = new EmailProperty(
-      [new TypeParameter(new TextType("WORK"), "emailproperty")],
-      new TextType(user?.email || '')
-    );
-
-    // not working //
-    const photo = new PhotoProperty(
-      [],
-      new URIType('http://www.example.com/pub/photos/jqpublic.gif')
-    );
+    // Not working!
+    // if(logo) {
+    //   vcard.photo.attachFromUrl('https://avatars2.githubusercontent.com/u/5659221?v=3&s=460', 'JPEG');
+    // }
     
-    const vcard = new VCARD([
-      full_name,
-      additional_name,
-      organization,
-      address,
-      phone,
-      work_phone,
-      email,
-    ]);
-
-    return vcard.repr();
-  } catch(err) {
+    return vcard.getFormattedString();
+  } catch (err) {
     throw new Error(err)
   }
 }
@@ -101,8 +33,8 @@ export async function generateQRCode(data) {
     const QRCodeStyling = (await import('qr-code-styling')).default;
     const {
       vcard,
-      color = '#4267b2',
-      backgroundColor = "#ffffff",
+      color,
+      backgroundColor,
       logo
     } = data;
 
@@ -111,20 +43,21 @@ export async function generateQRCode(data) {
       height: 300,
       data: vcard,
       dotsOptions: {
-        color: color,
-        type: "rounded",
+        color,
       },
       backgroundOptions: {
         color: backgroundColor,
       },
       imageOptions: {
         crossOrigin: "anonymous",
-        margin: 8
+        margin: 4,
+        imageSize: .3
       },
-      cornerSquareOptions: {
-        type: "extra-rounded", // dot, square, extra-rounded
-        color: '#eeeeee'
-      }
+      cornersSquareOptions: {
+        type: "square", // dot, square, extra-rounded
+        color: '#000000'
+      },
+      margin: 0,
     };
 
     if(logo) {
