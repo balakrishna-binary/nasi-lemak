@@ -1,4 +1,5 @@
 import type { CornerSquareType } from 'qr-code-styling';
+import * as Validator from '../../utils/validations';
 
 export async function generateVCard(user, logo) {
 	try {
@@ -17,12 +18,6 @@ export async function generateVCard(user, logo) {
 		if (user?.address?.zip) vcard.homeAddress.postalCode = user?.address?.zip;
 		if (user?.address?.countryRegion) vcard.homeAddress.countryRegion = user?.address?.street;
 		if (user?.gender) vcard.gender = user?.gender;
-		// vcard.birthday = new Date();
-
-		// Not working!
-		// if(logo) {
-		//   vcard.photo.attachFromUrl('https://avatars2.githubusercontent.com/u/5659221?v=3&s=460', 'JPEG');
-		// }
 
 		return vcard.getFormattedString();
 	} catch (err) {
@@ -65,4 +60,29 @@ export async function generateQRCode(data) {
 	} catch (err) {
 		throw new Error(err);
 	}
+}
+
+export function validate(data) {
+  let errors = {};
+	
+  if (data.email && !Validator.validateEmail(data.email)) {
+    errors['email'] = 'Invalid Email!';
+  };
+
+  if (data.phone && !Validator.validatePhone(data.phone)) {
+		errors['phone'] = 'Invalid Phone!';
+  };
+
+  if (data.work_phone && !Validator.validatePhone(data.work_phone)) {
+		errors['work_phone'] = 'Invalid Phone!'
+  }
+
+  if(data.website && !Validator.validateURI(data.website)) {
+		errors['website'] = 'Invalid URL!'
+  }
+
+  return {
+    is_valid: Object.keys(errors).length === 0,
+    errors
+  }
 }

@@ -2,14 +2,14 @@
 	import Input from '../Common/Input';
 	import QRCodeWrapper from '../Common/QRCodeWrapper';
 	import { initialData } from './constants';
-	import { generateVCard, generateQRCode } from './helpers';
-  import * as Validator from '../../utils/validations';
+	import { generateVCard, generateQRCode, validate } from './helpers';
 
 	let data = { ...initialData };
 	let base64_image;
 	let QRCODE;
 	let has_generated_qrcode;
 	let image;
+  let errors = {};
 
 	const dragNdrop = (event) => {
 		image = URL.createObjectURL(event.target.files[0]);
@@ -29,8 +29,10 @@
 	};
 
 	const onSubmit = async () => {
-    if(!(data.email && Validator.validateEmail(data.email))) return;
-    if(!(data.phone && Validator.validatePhone(data.phone))) return;
+    const { is_valid, errors: errs } = validate(data);
+		errors = errs;
+    if(!is_valid) return;
+		
 		const vcard = await generateVCard(data); // vcard v4
 		const qrcode_options = {
 			vcard,
@@ -50,6 +52,7 @@
 	const reset = () => {
 		data = { ...initialData };
 		base64_image = '';
+		errors = {};
 	};
 
 	$: full_name = [data.first_name, data.last_name]
@@ -113,21 +116,18 @@
 						</div>
 
 						<div class="width-100 d-flex jc-center flex-row input-wrapper">
-							<Input id="phone" bind:value={data.phone} placeholder="Phone" label="Phone" />
+							<Input id="phone" bind:value={data.phone} placeholder="Phone" label="Phone" error={errors && errors.phone || ''}/>
 							<Input
 								id="work_phone"
 								bind:value={data.work_phone}
 								placeholder="Work Phone"
 								label="Work Phone"
+								error={errors && errors.work_phone || ''}
 							/>
 						</div>
 
-						<div class="width-100 d-flex jc-center input-wrapper">
-							<Input id="fax" bind:value={data.fax} placeholder="Fax" label="Fax" />
-						</div>
-
 						<div class="width-100 d-flex jc-center flex-row input-wrapper">
-							<Input id="email" bind:value={data.email} placeholder="Email" label="Email" />
+							<Input id="email" bind:value={data.email} placeholder="Email" label="Email" error={errors && errors.email || ''}/>
 						</div>
 
 						<div class="width-100 d-flex jc-center flex-row input-wrapper">
@@ -161,7 +161,7 @@
 						</div>
 
 						<div class="width-100 d-flex jc-center input-wrapper">
-							<Input id="website" bind:value={data.website} placeholder="Website" label="Website" />
+							<Input id="website" bind:value={data.website} placeholder="Website" label="Website" error={errors && errors.website || ''} />
 						</div>
 					</div>
 					<div class="width-100 d-flex flex-row jc-center ai-center m-2">
@@ -336,6 +336,7 @@
 		margin: 0 8px;
 		padding: 0 8px;
 		overflow: hidden;
+		position: relative;
 	}
 	.form__input {
 		color: #333;
@@ -493,5 +494,17 @@
 			width: 100%;
 			margin: 0 auto;
 		}
+	}
+
+	.form__group span.error {
+		position: absolute;
+    right: 12px;
+    bottom: 6px;
+    color: #e70000;
+    font-size: 11px;
+	}
+
+	.form__group.has-error input {
+		border: 1px solid #e70000;
 	}
 </style>
