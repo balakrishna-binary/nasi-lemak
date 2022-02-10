@@ -9,7 +9,9 @@
 	let QRCODE;
 	let has_generated_qrcode;
 	let image;
-  let errors = {};
+	let errors = {};
+	let color = '#000';
+	let corner_color = '#000';
 
 	const dragNdrop = (event) => {
 		image = URL.createObjectURL(event.target.files[0]);
@@ -29,16 +31,16 @@
 	};
 
 	const onSubmit = async () => {
-    const { is_valid, errors: errs } = validate(data);
+		const { is_valid, errors: errs } = validate(data);
 		errors = errs;
-    if(!is_valid) return;
-		
+		if (!is_valid) return;
+
 		const vcard = await generateVCard(data); // vcard v4
 		const qrcode_options = {
 			vcard,
 			logo: base64_image,
-			color: '#4267b2', //
-			backgroundColor: '#ffffff' //
+			color, //
+			corner_color,//
 		};
 		QRCODE = await generateQRCode(qrcode_options);
 
@@ -66,6 +68,10 @@
 			extension: 'svg'
 		});
 	};
+
+	$: if(color && has_generated_qrcode || corner_color && has_generated_qrcode) {
+		onSubmit();
+	}
 </script>
 
 <div class="parent">
@@ -116,18 +122,30 @@
 						</div>
 
 						<div class="width-100 d-flex jc-center flex-row input-wrapper">
-							<Input id="phone" bind:value={data.phone} placeholder="Phone" label="Phone" error={errors && errors.phone || ''}/>
+							<Input
+								id="phone"
+								bind:value={data.phone}
+								placeholder="Phone"
+								label="Phone"
+								error={(errors && errors.phone) || ''}
+							/>
 							<Input
 								id="work_phone"
 								bind:value={data.work_phone}
 								placeholder="Work Phone"
 								label="Work Phone"
-								error={errors && errors.work_phone || ''}
+								error={(errors && errors.work_phone) || ''}
 							/>
 						</div>
 
 						<div class="width-100 d-flex jc-center flex-row input-wrapper">
-							<Input id="email" bind:value={data.email} placeholder="Email" label="Email" error={errors && errors.email || ''}/>
+							<Input
+								id="email"
+								bind:value={data.email}
+								placeholder="Email"
+								label="Email"
+								error={(errors && errors.email) || ''}
+							/>
 						</div>
 
 						<div class="width-100 d-flex jc-center flex-row input-wrapper">
@@ -161,7 +179,13 @@
 						</div>
 
 						<div class="width-100 d-flex jc-center input-wrapper">
-							<Input id="website" bind:value={data.website} placeholder="Website" label="Website" error={errors && errors.website || ''} />
+							<Input
+								id="website"
+								bind:value={data.website}
+								placeholder="Website"
+								label="Website"
+								error={(errors && errors.website) || ''}
+							/>
 						</div>
 					</div>
 					<div class="width-100 d-flex flex-row jc-center ai-center m-2">
@@ -175,6 +199,17 @@
 			<div class="qr-code-wrapper d-flex flex-column jc-center">
 				<QRCodeWrapper />
 				{#if has_generated_qrcode}
+					<div class="width-100 d-flex flex-row jc-center ai-center mt-2">
+						<div class="color-picker d-flex ai-center px-1">
+							<label for="color">QRCode Color</label>
+							<input type="color" bind:value={color} class="width-30" />
+						</div>
+						<div class="color-picker d-flex ai-center px-1">
+							<label for="color">Corner Color</label>
+							<input type="color" bind:value={corner_color} class="width-30" />
+						</div>
+					</div>
+
 					<div class="px-2 d-flex jc-center py-2">
 						<button class="btn btn-primary" on:click|preventDefault={download}> download </button>
 					</div>
@@ -216,6 +251,9 @@
 	}
 	.width-40 {
 		width: 40%;
+	}
+	.width-30 {
+		width: 30%;
 	}
 	.d-flex {
 		display: flex;
@@ -283,6 +321,9 @@
 	}
 	.mr-2 {
 		margin-right: 2rem;
+	}
+	.mt-2 {
+		margin-top: 2rem;
 	}
 	.mr-3 {
 		margin-right: 3rem;
@@ -498,13 +539,20 @@
 
 	.form__group span.error {
 		position: absolute;
-    right: 12px;
-    bottom: 6px;
-    color: #e70000;
-    font-size: 11px;
+		right: 12px;
+		bottom: 6px;
+		color: #e70000;
+		font-size: 11px;
 	}
 
 	.form__group.has-error input {
 		border: 1px solid #e70000;
+	}
+
+	.color-picker label {
+		color: #000;
+		font-weight: 500;
+		font-size: 12px;
+		margin-right: 16px;
 	}
 </style>

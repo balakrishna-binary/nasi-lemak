@@ -14,7 +14,7 @@ export async function generateVCard(user, logo) {
 		if (user?.designation) vcard.role = user.designation;
 		if (user?.website) vcard.url = user.website;
 		if (user?.address?.street) vcard.homeAddress.street = user?.address?.street;
-		if (user?.address?.city) vcard.homeAddress.city = user?.address?.city;
+		if (user?.address?.city) vcard.homeAddress.stateProvince = user?.address?.state;
 		if (user?.address?.zip) vcard.homeAddress.postalCode = user?.address?.zip;
 		if (user?.address?.countryRegion) vcard.homeAddress.countryRegion = user?.address?.street;
 		if (user?.gender) vcard.gender = user?.gender;
@@ -28,7 +28,7 @@ export async function generateVCard(user, logo) {
 export async function generateQRCode(data) {
 	try {
 		const QRCodeStyling = (await import('qr-code-styling')).default;
-		const { vcard, color, backgroundColor, logo } = data;
+		const { vcard, color, corner_color, logo } = data;
 
 		const options = {
 			width: 300,
@@ -38,7 +38,7 @@ export async function generateQRCode(data) {
 				color
 			},
 			backgroundOptions: {
-				color: backgroundColor
+				color: '#ffffff'
 			},
 			imageOptions: {
 				crossOrigin: 'anonymous',
@@ -47,7 +47,7 @@ export async function generateQRCode(data) {
 			},
 			cornersSquareOptions: {
 				type: 'square' as CornerSquareType, // dot, square, extra-rounded
-				color: '#000000'
+				color: corner_color
 			},
 			margin: 0
 		};
