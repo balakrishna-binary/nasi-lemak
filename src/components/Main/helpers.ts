@@ -1,3 +1,5 @@
+import type { CornerSquareType } from 'qr-code-styling';
+
 export async function generateVCard(user, logo) {
   try {
     const VCardJS = (await import('vcards-js')).default;
@@ -54,7 +56,7 @@ export async function generateQRCode(data) {
         imageSize: .3
       },
       cornersSquareOptions: {
-        type: "square", // dot, square, extra-rounded
+        type: "square" as CornerSquareType, // dot, square, extra-rounded
         color: '#000000'
       },
       margin: 0,
