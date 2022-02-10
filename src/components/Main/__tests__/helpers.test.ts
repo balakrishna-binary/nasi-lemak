@@ -3,17 +3,20 @@ import { generateVCard, generateQRCode } from '../helpers';
 
 describe('test helpers', () => {
 	test('generateVCard', async () => {
-		const result = await generateVCard({
-			first_name: 'Test',
-			last_name: '',
-			company: '',
-			designation: '',
-			address: { street: '', state: '', zip: '', country: '' },
-			website: '',
-			phone: '',
-			work_phone: '',
-			email: ''
-		},"");
+		const result = await generateVCard(
+			{
+				first_name: 'Test',
+				last_name: '',
+				company: '',
+				designation: '',
+				address: { street: '', state: '', zip: '', country: '' },
+				website: '',
+				phone: '',
+				work_phone: '',
+				email: ''
+			},
+			''
+		);
 		expect(result).toContain('Test');
 	});
 

@@ -1,1 +1,1 @@
-declare module "vcards-js";
+declare module 'vcards-js';
