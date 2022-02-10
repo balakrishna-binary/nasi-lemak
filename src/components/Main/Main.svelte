@@ -1,10 +1,10 @@
 <script>
-	import { VCARD } from 'vcard4';
 	import Input from '../Common/Input';
 	import QRCodeWrapper from '../Common/QRCodeWrapper';
 	import './index.css';
 	import { initialData } from './constants';
 	import { generateVCard, generateQRCode } from './helpers';
+  import * as Validator from '../../utils/validations';
 
 	let data = { ...initialData };
 	let base64_image;
@@ -30,6 +30,8 @@
 	};
 
 	const onSubmit = async () => {
+    if(!(data.email && Validator.validateEmail(data.email))) return;
+    if(!(data.phone && Validator.validatePhone(data.phone))) return;
 		const vcard = await generateVCard(data); // vcard v4
 		const qrcode_options = {
 			vcard,
