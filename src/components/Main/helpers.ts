@@ -1,4 +1,5 @@
 import type { CornerSquareType } from 'qr-code-styling';
+import * as Validator from '../../utils/validations';
 
 export async function generateVCard(user, logo) {
 	try {
@@ -13,16 +14,10 @@ export async function generateVCard(user, logo) {
 		if (user?.designation) vcard.role = user.designation;
 		if (user?.website) vcard.url = user.website;
 		if (user?.address?.street) vcard.homeAddress.street = user?.address?.street;
-		if (user?.address?.city) vcard.homeAddress.city = user?.address?.city;
+		if (user?.address?.city) vcard.homeAddress.stateProvince = user?.address?.state;
 		if (user?.address?.zip) vcard.homeAddress.postalCode = user?.address?.zip;
 		if (user?.address?.countryRegion) vcard.homeAddress.countryRegion = user?.address?.street;
 		if (user?.gender) vcard.gender = user?.gender;
-		// vcard.birthday = new Date();
-
-		// Not working!
-		// if(logo) {
-		//   vcard.photo.attachFromUrl('https://avatars2.githubusercontent.com/u/5659221?v=3&s=460', 'JPEG');
-		// }
 
 		return vcard.getFormattedString();
 	} catch (err) {
@@ -33,7 +28,7 @@ export async function generateVCard(user, logo) {
 export async function generateQRCode(data) {
 	try {
 		const QRCodeStyling = (await import('qr-code-styling')).default;
-		const { vcard, color, backgroundColor, logo } = data;
+		const { vcard, color, corner_color, logo } = data;
 
 		const options = {
 			width: 300,
@@ -43,7 +38,7 @@ export async function generateQRCode(data) {
 				color
 			},
 			backgroundOptions: {
-				color: backgroundColor
+				color: '#ffffff'
 			},
 			imageOptions: {
 				crossOrigin: 'anonymous',
@@ -52,7 +47,7 @@ export async function generateQRCode(data) {
 			},
 			cornersSquareOptions: {
 				type: 'square' as CornerSquareType, // dot, square, extra-rounded
-				color: '#000000'
+				color: corner_color
 			},
 			margin: 0
 		};
@@ -65,4 +60,29 @@ export async function generateQRCode(data) {
 	} catch (err) {
 		throw new Error(err);
 	}
+}
+
+export function validate(data) {
+  let errors = {};
+	
+  if (data.email && !Validator.validateEmail(data.email)) {
+    errors['email'] = 'Invalid Email!';
+  };
+
+  if (data.phone && !Validator.validatePhone(data.phone)) {
+		errors['phone'] = 'Invalid Phone!';
+  };
+
+  if (data.work_phone && !Validator.validatePhone(data.work_phone)) {
+		errors['work_phone'] = 'Invalid Phone!'
+  }
+
+  if(data.website && !Validator.validateURI(data.website)) {
+		errors['website'] = 'Invalid URL!'
+  }
+
+  return {
+    is_valid: Object.keys(errors).length === 0,
+    errors
+  }
 }
