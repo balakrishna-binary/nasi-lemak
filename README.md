@@ -2,6 +2,12 @@
 
 https://nasi-lemak-code-coverage.vercel.app/
 
+
+## Lighthouse score
+
+![image](https://user-images.githubusercontent.com/56330681/153536980-1e08c617-4357-46a4-b28b-465e6090ceb0.png)
+
+
 ## Developing
 
 Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
